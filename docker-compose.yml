@@ -1,0 +1,39 @@
+version: "2"
+services:
+    www:
+        build: .
+        ports: 
+            - "8001:80"
+        volumes:
+            - ./www/html:/var/www/html
+        links:
+            - db
+        networks:
+            - default
+    db:
+        image: mysql
+        ports: 
+            - "3306:3306"
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: asir
+            MYSQL_USER: ionut
+            MYSQL_PASSWORD: castelao
+            MYSQL_ROOT_PASSWORD: castelao
+        volumes:
+            - ./dump:/docker-entrypoint-initdb.d
+            - ./dump/mysql:/var/lib/mysql
+        networks:
+            - default
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        depends_on: #indica que hasta que no esté levantado el otro servicio, que no se arranque este.
+            - db
+        links: 
+            - db:db
+        ports:
+            - 8000:80
+        environment:
+            MYSQL_USER: ionut
+            MYSQL_PASSWORD: castelao
+            MYSQL_ROOT_PASSWORD: castelao
